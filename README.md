@@ -10,5 +10,6 @@ Copy `run-example.sh` to `run.sh` and add your bot key.
 
 ```
 * setvol xx%: Set volume to xx percent.
+* sleep: Put the comptuer into sleep mode
 * help: Print the help text
 ```

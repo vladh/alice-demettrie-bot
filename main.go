@@ -16,6 +16,7 @@ import (
 const HELP_TEXT = `Here's some help to get you started.
 
 * setvol xx%: Set volume to xx percent.
+* sleep: Put the comptuer into sleep mode
 * help: Print the help text
 `
 
