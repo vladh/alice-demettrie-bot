@@ -2,6 +2,8 @@
 
 A simple Telegram bot for vladh.
 
+Only works on Windows and requires `nircmd` to be in your `PATH`.
+
 ## How to run
 
 Copy `run-example.sh` to `run.sh` and add your bot key.
