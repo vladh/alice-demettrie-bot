@@ -2,7 +2,7 @@
 
 A simple Telegram bot for vladh.
 
-Only works on Windows and requires `nircmd` to be in your `PATH`.
+Works on Linux and Windows. On Windows, requires `nircmd` to be in your `PATH`.
 
 ## How to run
 

@@ -6,6 +6,7 @@ import (
   "os"
   "os/exec"
   "regexp"
+  "runtime"
   "strconv"
   "strings"
 
@@ -21,10 +22,36 @@ const HELP_TEXT = `Here's some help to get you started.
 `
 
 
-func processMessage(update tgbotapi.Update) string {
-  if strings.HasPrefix(update.Message.Text, "setvol") {
+func setVolume(percentage float64) bool {
+  if runtime.GOOS == "windows" {
+    vol := int((percentage / 100.0) * 65535.0)
+    cmd := exec.Command("nircmd", "setsysvolume", strconv.Itoa(vol))
+    err := cmd.Run()
+    return err == nil
+  } else if runtime.GOOS == "linux" {
+    cmd := exec.Command("amixer", "sset", "Master", fmt.Sprintf("%f%%", percentage))
+    err := cmd.Run()
+    return err == nil
+  }
+  return false
+}
+
+
+func goToSleep() bool {
+  if runtime.GOOS == "windows" {
+    cmd := exec.Command("nircmd", "standby")
+    err := cmd.Run()
+    return err == nil
+  } else if runtime.GOOS == "linux" {
+    return false // TODO
+  }
+  return false
+}
+
+
+func trySetvolCommand(messageText string) string {
     r := regexp.MustCompile(`setvol ([0-9]+)%`)
-    submatch := r.FindStringSubmatch(update.Message.Text)
+    submatch := r.FindStringSubmatch(messageText)
     if len(submatch) != 2 {
       return "Wait, what do you mean? (usage: setvol xx%)"
     }
@@ -34,26 +61,35 @@ func processMessage(update tgbotapi.Update) string {
       return "Wait, what do you mean? (usage: setvol xx%)"
     }
 
-    vol := int((float64(percentage) / 100.0) * 65535.0)
-    cmd := exec.Command("nircmd", "setsysvolume", strconv.Itoa(vol))
-    err = cmd.Run()
-
-    if err != nil {
+    if setVolume(float64(percentage)) {
+      return fmt.Sprintf("Okay, set volume to %d%%", percentage)
+    } else {
       return "That didn't work (error running volume command)"
     }
+}
 
-    return fmt.Sprintf("Okay, set volume to %d%% (%d)", percentage, vol)
-  } else if strings.HasPrefix(update.Message.Text, "sleep") {
-    cmd := exec.Command("nircmd", "standby")
-    err := cmd.Run()
 
-    if err != nil {
-      return "That didn't work (error running sleep command)"
-    }
-
+func trySleepCommand() string {
+  if goToSleep() {
     return "Nighty night (sleeping)"
+  } else {
+    return "That didn't work (error running sleep command)"
+  }
+}
+
+
+func tryHelpCommand() string {
+  return HELP_TEXT
+}
+
+
+func processMessage(update tgbotapi.Update) string {
+  if strings.HasPrefix(update.Message.Text, "setvol") {
+    return trySetvolCommand(update.Message.Text)
+  } else if strings.HasPrefix(update.Message.Text, "sleep") {
+    return trySleepCommand()
   } else if strings.HasPrefix(update.Message.Text, "help") {
-    return HELP_TEXT
+    return tryHelpCommand()
   }
 
   return "Whatever you say :) (command not found)"
