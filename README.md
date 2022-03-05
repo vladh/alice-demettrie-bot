@@ -6,7 +6,26 @@ Works on Linux and Windows. On Windows, requires `nircmd` to be in your `PATH`.
 
 ## How to run
 
-Copy `run-example.sh` to `run.sh` and add your bot key.
+Create a `config.go` file with the following format:
+
+```
+package main
+
+const TOKEN = "..."
+```
+
+Compile with:
+
+```
+make
+```
+
+If you want Alice to run on startup, install her and add her to systemd:
+
+```
+sudo cp alice /usr/bin/
+sudo cp alice.service /etc/systemd/user/
+```
 
 ## Commands
 
