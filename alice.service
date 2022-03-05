@@ -6,4 +6,4 @@ Type=simple
 ExecStart=alice
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
